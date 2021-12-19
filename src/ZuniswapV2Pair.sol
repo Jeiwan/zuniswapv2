@@ -1,9 +1,12 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.10;
 
-import "./ERC20.sol";
-import "../lib/openzeppelin-contracts/contracts/token/ERC20/IERC20.sol";
+import "solmate/tokens/ERC20.sol";
 import "./libraries/Math.sol";
+
+interface IERC20 {
+    function balanceOf(address) external returns (uint256);
+}
 
 error InsufficientLiquidity();
 
@@ -19,7 +22,7 @@ contract ZuniswapV2Pair is ERC20, Math {
     event Sync(uint256 reserve0, uint256 reserve1);
 
     constructor(address token0_, address token1_)
-        ERC20("ZuniswapV2 Pair", "ZUNIV2")
+        ERC20("ZuniswapV2 Pair", "ZUNIV2", 18)
     {
         token0 = token0_;
         token1 = token1_;
@@ -34,13 +37,13 @@ contract ZuniswapV2Pair is ERC20, Math {
 
         uint256 liquidity;
 
-        if (totalSupply() == 0) {
+        if (totalSupply == 0) {
             liquidity = Math.sqrt(amount0 * amount1) - MINIMUM_LIQUIDITY;
             _mint(address(0), MINIMUM_LIQUIDITY);
         } else {
             liquidity = Math.min(
-                (amount0 * totalSupply()) / reserve0,
-                (amount1 * totalSupply()) / reserve1
+                (amount0 * totalSupply) / reserve0,
+                (amount1 * totalSupply) / reserve1
             );
         }
 
