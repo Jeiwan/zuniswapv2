@@ -18,8 +18,10 @@ contract ZuniswapV2Pair is ERC20, Math {
 
     address public token0;
     address public token1;
-    uint256 public reserve0;
-    uint256 public reserve1;
+
+    uint112 private reserve0;
+    uint112 private reserve1;
+    uint32 private blockTimestampLast;
 
     event Burn(address indexed sender, uint256 amount0, uint256 amount1);
     event Mint(address indexed sender, uint256 amount0, uint256 amount1);
@@ -33,11 +35,11 @@ contract ZuniswapV2Pair is ERC20, Math {
     }
 
     function mint() public {
-        // TODO: Gas saving
+        (uint112 _reserve0, uint112 _reserve1, ) = getReserves();
         uint256 balance0 = IERC20(token0).balanceOf(address(this));
         uint256 balance1 = IERC20(token1).balanceOf(address(this));
-        uint256 amount0 = balance0 - reserve0;
-        uint256 amount1 = balance0 - reserve1;
+        uint256 amount0 = balance0 - _reserve0;
+        uint256 amount1 = balance0 - _reserve1;
 
         uint256 liquidity;
 
@@ -46,8 +48,8 @@ contract ZuniswapV2Pair is ERC20, Math {
             _mint(address(0), MINIMUM_LIQUIDITY);
         } else {
             liquidity = Math.min(
-                (amount0 * totalSupply) / reserve0,
-                (amount1 * totalSupply) / reserve1
+                (amount0 * totalSupply) / _reserve0,
+                (amount1 * totalSupply) / _reserve1
             );
         }
 
@@ -83,6 +85,18 @@ contract ZuniswapV2Pair is ERC20, Math {
         emit Burn(msg.sender, amount0, amount1);
     }
 
+    function getReserves()
+        public
+        view
+        returns (
+            uint112,
+            uint112,
+            uint32
+        )
+    {
+        return (reserve0, reserve1, blockTimestampLast);
+    }
+
     //
     //
     //
@@ -91,8 +105,8 @@ contract ZuniswapV2Pair is ERC20, Math {
     //
     //
     function _update(uint256 balance0, uint256 balance1) private {
-        reserve0 = balance0;
-        reserve1 = balance1;
+        reserve0 = uint112(balance0);
+        reserve1 = uint112(balance1);
 
         emit Sync(reserve0, reserve1);
     }

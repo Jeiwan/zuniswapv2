@@ -9,6 +9,8 @@ interface Vm {
     function expectRevert(bytes calldata) external;
 
     function prank(address) external;
+
+    function load(address c, bytes32 loc) external returns (bytes32);
 }
 
 contract ZuniswapV2PairTest is DSTest {
@@ -27,6 +29,16 @@ contract ZuniswapV2PairTest is DSTest {
         token1.mint(10 ether);
     }
 
+    function _assertReserves(
+        ZuniswapV2Pair _pair,
+        uint112 expectedReserve0,
+        uint112 expectedReserve1
+    ) internal {
+        (uint112 reserve0, uint112 reserve1, ) = _pair.getReserves();
+        assertEq(reserve0, expectedReserve0, "reserve0 doesn't match");
+        assertEq(reserve1, expectedReserve1, "reserve1 doesn't match");
+    }
+
     function testMintBootstrap() public {
         token0.transfer(address(pair), 1 ether);
         token1.transfer(address(pair), 1 ether);
@@ -34,8 +46,7 @@ contract ZuniswapV2PairTest is DSTest {
         pair.mint();
 
         assertEq(pair.balanceOf(address(this)), 999999999999999000);
-        assertEq(pair.reserve0(), 1 ether);
-        assertEq(pair.reserve1(), 1 ether);
+        _assertReserves(pair, 1 ether, 1 ether);
         assertEq(pair.totalSupply(), 1 ether);
     }
 
@@ -56,8 +67,7 @@ contract ZuniswapV2PairTest is DSTest {
         uint256 balanceDiff = balanceAfter - balanceBefore;
 
         assertEq(balanceDiff, 500000000000000000);
-        assertEq(pair.reserve0(), 1.5 ether);
-        assertEq(pair.reserve1(), 1.5 ether);
+        _assertReserves(pair, 1.5 ether, 1.5 ether);
         assertEq(pair.totalSupply(), 1500000000000000000);
     }
 
@@ -86,8 +96,7 @@ contract ZuniswapV2PairTest is DSTest {
         pair.burn();
 
         assertEq(pair.balanceOf(address(this)), 0);
-        assertEq(pair.reserve0(), 1000);
-        assertEq(pair.reserve1(), 1000);
+        _assertReserves(pair, 1000, 1000);
         assertEq(pair.totalSupply(), 1000);
     }
 
@@ -111,5 +120,17 @@ contract ZuniswapV2PairTest is DSTest {
         vm.prank(address(0xdeadbeef));
         vm.expectRevert(hex"749383ad"); // InsufficientLiquidityBurned()
         pair.burn();
+    }
+
+    function testReservesPacking() public {
+        token0.transfer(address(pair), 1 ether);
+        token1.transfer(address(pair), 2 ether);
+        pair.mint();
+
+        bytes32 val = vm.load(address(pair), bytes32(uint256(8)));
+        assertEq(
+            val,
+            hex"000000000000000000001bc16d674ec800000000000000000de0b6b3a7640000"
+        );
     }
 }
