@@ -12,6 +12,7 @@ interface IERC20 {
 
 error InsufficientLiquidityMinted();
 error InsufficientLiquidityBurned();
+error TransferFailed();
 
 contract ZuniswapV2Pair is ERC20, Math {
     uint256 constant MINIMUM_LIQUIDITY = 1000;
@@ -74,8 +75,8 @@ contract ZuniswapV2Pair is ERC20, Math {
 
         _burn(msg.sender, liquidity);
 
-        IERC20(token0).transfer(msg.sender, amount0);
-        IERC20(token1).transfer(msg.sender, amount1);
+        _safeTransfer(token0, msg.sender, amount0);
+        _safeTransfer(token1, msg.sender, amount1);
 
         balance0 = IERC20(token0).balanceOf(address(this));
         balance1 = IERC20(token1).balanceOf(address(this));
@@ -109,5 +110,17 @@ contract ZuniswapV2Pair is ERC20, Math {
         reserve1 = uint112(balance1);
 
         emit Sync(reserve0, reserve1);
+    }
+
+    function _safeTransfer(
+        address token,
+        address to,
+        uint256 value
+    ) private {
+        (bool success, bytes memory data) = token.call(
+            abi.encodeWithSignature("transfer(address,uint256)", to, value)
+        );
+        if (!success || (data.length != 0 && !abi.decode(data, (bool))))
+            revert TransferFailed();
     }
 }
