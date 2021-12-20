@@ -52,4 +52,18 @@ contract ZuniswapV2PairTest is DSTest {
         assertEq(pair.reserve1(), 1.5 ether);
         assertEq(pair.totalSupply(), 1500000000000000000);
     }
+
+    function testBurn() public {
+        token0.transfer(address(pair), 1 ether);
+        token1.transfer(address(pair), 1 ether);
+
+        pair.mint();
+
+        pair.burn();
+
+        assertEq(pair.balanceOf(address(this)), 0);
+        assertEq(pair.reserve0(), 1000);
+        assertEq(pair.reserve1(), 1000);
+        assertEq(pair.totalSupply(), 1000);
+    }
 }
