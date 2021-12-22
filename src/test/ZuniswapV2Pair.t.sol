@@ -11,6 +11,8 @@ interface Vm {
     function prank(address) external;
 
     function load(address c, bytes32 loc) external returns (bytes32);
+
+    function warp(uint256) external;
 }
 
 contract ZuniswapV2PairTest is DSTest {
@@ -29,14 +31,28 @@ contract ZuniswapV2PairTest is DSTest {
         token1.mint(10 ether);
     }
 
-    function _assertReserves(
-        ZuniswapV2Pair _pair,
-        uint112 expectedReserve0,
-        uint112 expectedReserve1
+    function assertReserves(uint112 expectedReserve0, uint112 expectedReserve1)
+        internal
+    {
+        (uint112 reserve0, uint112 reserve1, ) = pair.getReserves();
+        assertEq(reserve0, expectedReserve0, "unexpected reserve0");
+        assertEq(reserve1, expectedReserve1, "unexpected reserve1");
+    }
+
+    function assertCumulativePrices(
+        uint256 expectedPrice0,
+        uint256 expectedPrice1
     ) internal {
-        (uint112 reserve0, uint112 reserve1, ) = _pair.getReserves();
-        assertEq(reserve0, expectedReserve0, "reserve0 doesn't match");
-        assertEq(reserve1, expectedReserve1, "reserve1 doesn't match");
+        assertEq(
+            pair.price0CumulativeLast(),
+            expectedPrice0,
+            "unexpected cumulative price 0"
+        );
+        assertEq(
+            pair.price1CumulativeLast(),
+            expectedPrice1,
+            "unexpected cumulative price 1"
+        );
     }
 
     function testMintBootstrap() public {
@@ -45,9 +61,10 @@ contract ZuniswapV2PairTest is DSTest {
 
         pair.mint();
 
-        assertEq(pair.balanceOf(address(this)), 999999999999999000);
-        _assertReserves(pair, 1 ether, 1 ether);
+        assertEq(pair.balanceOf(address(this)), 0.999999999999999000 ether);
+        assertReserves(1 ether, 1 ether);
         assertEq(pair.totalSupply(), 1 ether);
+        assertCumulativePrices(0, 0);
     }
 
     function testMintWhenTheresLiquidity() public {
@@ -55,6 +72,8 @@ contract ZuniswapV2PairTest is DSTest {
         token1.transfer(address(pair), 1 ether);
 
         pair.mint();
+
+        vm.warp(37);
 
         token0.transfer(address(pair), 0.5 ether);
         token1.transfer(address(pair), 0.5 ether);
@@ -66,9 +85,59 @@ contract ZuniswapV2PairTest is DSTest {
         uint256 balanceAfter = pair.balanceOf(address(this));
         uint256 balanceDiff = balanceAfter - balanceBefore;
 
-        assertEq(balanceDiff, 500000000000000000);
-        _assertReserves(pair, 1.5 ether, 1.5 ether);
-        assertEq(pair.totalSupply(), 1500000000000000000);
+        assertEq(balanceDiff, 0.5 ether);
+        assertEq(pair.totalSupply(), 1.5 ether);
+        assertReserves(1.5 ether, 1.5 ether);
+        assertCumulativePrices(37, 37);
+    }
+
+    function testPricesAccumulation() public {
+        token0.transfer(address(pair), 1 ether);
+        token1.transfer(address(pair), 1 ether);
+        pair.mint();
+
+        // Reserves not updated.
+        assertCumulativePrices(0, 0);
+
+        // Reserves updated, 1 second passed.
+        vm.warp(1);
+        pair.sync();
+        assertCumulativePrices(1, 1);
+
+        // Reserves updated, 2 seconds passed.
+        vm.warp(2);
+        pair.sync();
+        assertCumulativePrices(2, 2);
+
+        // Price changed.
+        vm.warp(3);
+        token0.transfer(address(pair), 2 ether);
+        token1.transfer(address(pair), 1 ether);
+        pair.mint();
+
+        // Reserves updated, 0 seconds passed.
+        pair.sync();
+        assertCumulativePrices(3, 3);
+
+        // Reserves updated, 1 second passed.
+        vm.warp(4);
+        pair.sync();
+        assertCumulativePrices(3, 4);
+
+        // Reserves updated, 2 seconds passed.
+        vm.warp(5);
+        pair.sync();
+        assertCumulativePrices(3, 5);
+
+        // Reserves updated, 3 seconds passed.
+        vm.warp(6);
+        pair.sync();
+        assertCumulativePrices(3, 6);
+
+        // Reserves updated, 4 seconds passed.
+        vm.warp(7);
+        pair.sync();
+        assertCumulativePrices(3, 7);
     }
 
     function testMintLiquidityUnderflow() public {
@@ -96,7 +165,7 @@ contract ZuniswapV2PairTest is DSTest {
         pair.burn();
 
         assertEq(pair.balanceOf(address(this)), 0);
-        _assertReserves(pair, 1000, 1000);
+        assertReserves(1000, 1000);
         assertEq(pair.totalSupply(), 1000);
     }
 
