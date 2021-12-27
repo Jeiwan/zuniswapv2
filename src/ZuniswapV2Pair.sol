@@ -43,7 +43,7 @@ contract ZuniswapV2Pair is ERC20, Math {
         uint256 balance0 = IERC20(token0).balanceOf(address(this));
         uint256 balance1 = IERC20(token1).balanceOf(address(this));
         uint256 amount0 = balance0 - _reserve0;
-        uint256 amount1 = balance0 - _reserve1;
+        uint256 amount1 = balance1 - _reserve1;
 
         uint256 liquidity;
 
