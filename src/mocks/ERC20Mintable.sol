@@ -8,7 +8,7 @@ contract ERC20Mintable is ERC20 {
         ERC20(name_, symbol_, 18)
     {}
 
-    function mint(uint256 amount) public {
-        _mint(msg.sender, amount);
+    function mint(uint256 amount, address to) public {
+        _mint(to, amount);
     }
 }
