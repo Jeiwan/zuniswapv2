@@ -131,9 +131,7 @@ contract ZuniswapV2PairTest is DSTest {
         token0.transfer(address(pair), 2 ether);
         token1.transfer(address(pair), 1 ether);
         pair.mint();
-
-        // Reserves updated, 0 seconds passed.
-        pair.sync();
+        // 0 seconds passed
         assertCumulativePrices(3, 3);
 
         // Reserves updated, 1 second passed.
