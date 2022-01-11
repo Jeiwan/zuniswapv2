@@ -22,10 +22,6 @@ contract ZuniswapV2Pair is ERC20, Math {
 
     uint112 private reserve0;
     uint112 private reserve1;
-    uint32 private blockTimestampLast;
-
-    uint256 public price0CumulativeLast;
-    uint256 public price1CumulativeLast;
 
     event Burn(address indexed sender, uint256 amount0, uint256 amount1);
     event Mint(address indexed sender, uint256 amount0, uint256 amount1);
@@ -105,7 +101,7 @@ contract ZuniswapV2Pair is ERC20, Math {
             uint32
         )
     {
-        return (reserve0, reserve1, blockTimestampLast);
+        return (reserve0, reserve1, 0);
     }
 
     //
@@ -116,19 +112,8 @@ contract ZuniswapV2Pair is ERC20, Math {
     //
     //
     function _update(uint256 balance0, uint256 balance1) private {
-        uint32 blockTimestamp = uint32(block.timestamp);
-        uint32 timeElapsed = blockTimestamp - blockTimestampLast;
-
-        if (timeElapsed > 0 && reserve0 != 0 && reserve1 != 0) {
-            unchecked {
-                price0CumulativeLast += (reserve1 / reserve0) * timeElapsed;
-                price1CumulativeLast += (reserve0 / reserve1) * timeElapsed;
-            }
-        }
-
         reserve0 = uint112(balance0);
         reserve1 = uint112(balance1);
-        blockTimestampLast = blockTimestamp;
 
         emit Sync(reserve0, reserve1);
     }

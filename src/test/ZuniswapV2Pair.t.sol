@@ -45,22 +45,6 @@ contract ZuniswapV2PairTest is DSTest {
         assertEq(reserve1, expectedReserve1, "unexpected reserve1");
     }
 
-    function assertCumulativePrices(
-        uint256 expectedPrice0,
-        uint256 expectedPrice1
-    ) internal {
-        assertEq(
-            pair.price0CumulativeLast(),
-            expectedPrice0,
-            "unexpected cumulative price 0"
-        );
-        assertEq(
-            pair.price1CumulativeLast(),
-            expectedPrice1,
-            "unexpected cumulative price 1"
-        );
-    }
-
     function testMintBootstrap() public {
         token0.transfer(address(pair), 1 ether);
         token1.transfer(address(pair), 1 ether);
@@ -70,7 +54,6 @@ contract ZuniswapV2PairTest is DSTest {
         assertEq(pair.balanceOf(address(this)), 1 ether - 1000);
         assertReserves(1 ether, 1 ether);
         assertEq(pair.totalSupply(), 1 ether);
-        assertCumulativePrices(0, 0);
     }
 
     function testMintWhenTheresLiquidity() public {
@@ -89,7 +72,6 @@ contract ZuniswapV2PairTest is DSTest {
         assertEq(pair.balanceOf(address(this)), 3 ether - 1000);
         assertEq(pair.totalSupply(), 3 ether);
         assertReserves(3 ether, 3 ether);
-        assertCumulativePrices(37, 37);
     }
 
     function testMintUnbalanced() public {
@@ -106,53 +88,6 @@ contract ZuniswapV2PairTest is DSTest {
         pair.mint(); // + 1 LP
         assertEq(pair.balanceOf(address(this)), 2 ether - 1000);
         assertReserves(3 ether, 2 ether);
-    }
-
-    function testPricesAccumulation() public {
-        token0.transfer(address(pair), 1 ether);
-        token1.transfer(address(pair), 1 ether);
-        pair.mint();
-
-        // Reserves not updated.
-        assertCumulativePrices(0, 0);
-
-        // Reserves updated, 1 second passed.
-        vm.warp(1);
-        pair.sync();
-        assertCumulativePrices(1, 1);
-
-        // Reserves updated, 2 seconds passed.
-        vm.warp(2);
-        pair.sync();
-        assertCumulativePrices(2, 2);
-
-        // Price changed.
-        vm.warp(3);
-        token0.transfer(address(pair), 2 ether);
-        token1.transfer(address(pair), 1 ether);
-        pair.mint();
-        // 0 seconds passed
-        assertCumulativePrices(3, 3);
-
-        // Reserves updated, 1 second passed.
-        vm.warp(4);
-        pair.sync();
-        assertCumulativePrices(3, 4);
-
-        // Reserves updated, 2 seconds passed.
-        vm.warp(5);
-        pair.sync();
-        assertCumulativePrices(3, 5);
-
-        // Reserves updated, 3 seconds passed.
-        vm.warp(6);
-        pair.sync();
-        assertCumulativePrices(3, 6);
-
-        // Reserves updated, 4 seconds passed.
-        vm.warp(7);
-        pair.sync();
-        assertCumulativePrices(3, 7);
     }
 
     function testMintLiquidityUnderflow() public {
