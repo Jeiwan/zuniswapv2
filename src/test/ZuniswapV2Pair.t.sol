@@ -277,6 +277,50 @@ contract ZuniswapV2PairTest is DSTest {
         vm.expectRevert(hex"bb55fd27"); // InsufficientLiquidity
         pair.swap(1.1 ether, 0, address(this));
     }
+
+    function testSwapUnderpriced() public {
+        token0.transfer(address(pair), 1 ether);
+        token1.transfer(address(pair), 2 ether);
+        pair.mint();
+
+        token0.transfer(address(pair), 0.1 ether);
+        pair.swap(0, 0.09 ether, address(this));
+
+        assertEq(
+            token0.balanceOf(address(this)),
+            10 ether - 1 ether - 0.1 ether,
+            "unexpected token0 balance"
+        );
+        assertEq(
+            token1.balanceOf(address(this)),
+            10 ether - 2 ether + 0.09 ether,
+            "unexpected token1 balance"
+        );
+        assertReserves(1 ether + 0.1 ether, 2 ether - 0.09 ether);
+    }
+
+    function testSwapOverpriced() public {
+        token0.transfer(address(pair), 1 ether);
+        token1.transfer(address(pair), 2 ether);
+        pair.mint();
+
+        token0.transfer(address(pair), 0.1 ether);
+
+        vm.expectRevert(hex"bd8bc364"); // InsufficientLiquidity
+        pair.swap(0, 0.36 ether, address(this));
+
+        assertEq(
+            token0.balanceOf(address(this)),
+            10 ether - 1 ether - 0.1 ether,
+            "unexpected token0 balance"
+        );
+        assertEq(
+            token1.balanceOf(address(this)),
+            10 ether - 2 ether,
+            "unexpected token1 balance"
+        );
+        assertReserves(1 ether, 2 ether);
+    }
 }
 
 contract TestUser {
