@@ -202,6 +202,48 @@ contract ZuniswapV2PairTest is Test {
             hex"000000000000000000001bc16d674ec800000000000000000de0b6b3a7640000"
         );
     }
+
+    function testSwapBasicScenario() public {
+        token0.transfer(address(pair), 1 ether);
+        token1.transfer(address(pair), 2 ether);
+        pair.mint();
+
+        token0.transfer(address(pair), 0.1 ether);
+        pair.swap(0, 0.18 ether, address(this));
+
+        assertEq(
+            token0.balanceOf(address(this)),
+            10 ether - 1 ether - 0.1 ether,
+            "unexpected token0 balance"
+        );
+        assertEq(
+            token1.balanceOf(address(this)),
+            10 ether - 2 ether + 0.18 ether,
+            "unexpected token1 balance"
+        );
+        assertReserves(1 ether + 0.1 ether, 2 ether - 0.18 ether);
+    }
+
+    function testSwapBasicScenarioReverseDirection() public {
+        token0.transfer(address(pair), 1 ether);
+        token1.transfer(address(pair), 2 ether);
+        pair.mint();
+
+        token1.transfer(address(pair), 0.2 ether);
+        pair.swap(0.09 ether, 0, address(this));
+
+        assertEq(
+            token0.balanceOf(address(this)),
+            10 ether - 1 ether + 0.09 ether,
+            "unexpected token0 balance"
+        );
+        assertEq(
+            token1.balanceOf(address(this)),
+            10 ether - 2 ether - 0.2 ether,
+            "unexpected token1 balance"
+        );
+        assertReserves(1 ether - 0.09 ether, 2 ether + 0.2 ether);
+    }
 }
 
 contract TestUser {
