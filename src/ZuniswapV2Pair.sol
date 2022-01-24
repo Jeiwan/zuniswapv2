@@ -44,11 +44,11 @@ contract ZuniswapV2Pair is ERC20, Math {
     }
 
     function mint() public {
-        (uint112 _reserve0, uint112 _reserve1, ) = getReserves();
+        (uint112 reserve0_, uint112 reserve1_, ) = getReserves();
         uint256 balance0 = IERC20(token0).balanceOf(address(this));
         uint256 balance1 = IERC20(token1).balanceOf(address(this));
-        uint256 amount0 = balance0 - _reserve0;
-        uint256 amount1 = balance1 - _reserve1;
+        uint256 amount0 = balance0 - reserve0_;
+        uint256 amount1 = balance1 - reserve1_;
 
         uint256 liquidity;
 
@@ -57,8 +57,8 @@ contract ZuniswapV2Pair is ERC20, Math {
             _mint(address(0), MINIMUM_LIQUIDITY);
         } else {
             liquidity = Math.min(
-                (amount0 * totalSupply) / _reserve0,
-                (amount1 * totalSupply) / _reserve1
+                (amount0 * totalSupply) / reserve0_,
+                (amount1 * totalSupply) / reserve1_
             );
         }
 
