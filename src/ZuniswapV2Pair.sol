@@ -107,15 +107,15 @@ contract ZuniswapV2Pair is ERC20, Math {
         if (amount0Out > reserve0_ || amount1Out > reserve1_)
             revert InsufficientLiquidity();
 
-        if (amount0Out > 0) _safeTransfer(token0, to, amount0Out);
-        if (amount1Out > 0) _safeTransfer(token1, to, amount1Out);
-
-        uint256 balance0 = IERC20(token0).balanceOf(address(this));
-        uint256 balance1 = IERC20(token1).balanceOf(address(this));
+        uint256 balance0 = IERC20(token0).balanceOf(address(this)) - amount0Out;
+        uint256 balance1 = IERC20(token1).balanceOf(address(this)) - amount1Out;
 
         if (balance0 * balance1 < reserve0_ * reserve1_) revert InvalidK();
 
         _update(balance0, balance1);
+
+        if (amount0Out > 0) _safeTransfer(token0, to, amount0Out);
+        if (amount1Out > 0) _safeTransfer(token1, to, amount1Out);
 
         emit Swap(msg.sender, amount0Out, amount1Out, to);
     }
