@@ -14,6 +14,7 @@ error InsufficientLiquidityMinted();
 error InsufficientLiquidityBurned();
 error InsufficientOutputAmount();
 error InsufficientLiquidity();
+error InvalidK();
 error TransferFailed();
 
 contract ZuniswapV2Pair is ERC20, Math {
