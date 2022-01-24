@@ -244,6 +244,27 @@ contract ZuniswapV2PairTest is Test {
         );
         assertReserves(1 ether - 0.09 ether, 2 ether + 0.2 ether);
     }
+
+    function testSwapZeroOut() public {
+        token0.transfer(address(pair), 1 ether);
+        token1.transfer(address(pair), 2 ether);
+        pair.mint();
+
+        vm.expectRevert(hex"42301c23"); // InsufficientOutputAmount
+        pair.swap(0, 0, address(this));
+    }
+
+    function testSwapInsufficientLiquidity() public {
+        token0.transfer(address(pair), 1 ether);
+        token1.transfer(address(pair), 2 ether);
+        pair.mint();
+
+        vm.expectRevert(hex"bb55fd27"); // InsufficientLiquidity
+        pair.swap(0, 2.1 ether, address(this));
+
+        vm.expectRevert(hex"bb55fd27"); // InsufficientLiquidity
+        pair.swap(1.1 ether, 0, address(this));
+    }
 }
 
 contract TestUser {
