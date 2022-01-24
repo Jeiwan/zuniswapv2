@@ -12,6 +12,10 @@ interface IERC20 {
 
 error InsufficientLiquidityMinted();
 error InsufficientLiquidityBurned();
+error InsufficientOutputAmount();
+error InsufficientLiquidity();
+error InsufficientInputAmount();
+error InvalidK();
 error TransferFailed();
 
 contract ZuniswapV2Pair is ERC20, Math {
@@ -26,6 +30,14 @@ contract ZuniswapV2Pair is ERC20, Math {
     event Burn(address indexed sender, uint256 amount0, uint256 amount1);
     event Mint(address indexed sender, uint256 amount0, uint256 amount1);
     event Sync(uint256 reserve0, uint256 reserve1);
+    event Swap(
+        address indexed sender,
+        uint256 amount0In,
+        uint256 amount1In,
+        uint256 amount0Out,
+        uint256 amount1Out,
+        address indexed to
+    );
 
     constructor(address token0_, address token1_)
         ERC20("ZuniswapV2 Pair", "ZUNIV2", 18)
@@ -83,6 +95,32 @@ contract ZuniswapV2Pair is ERC20, Math {
         _update(balance0, balance1);
 
         emit Burn(msg.sender, amount0, amount1);
+    }
+
+    function swap(
+        uint256 amount0Out,
+        uint256 amount1Out,
+        address to
+    ) public {
+        if (amount0Out == 0 && amount1Out == 0)
+            revert InsufficientOutputAmount();
+
+        (uint256 reserve0_, uint256 reserve1_, ) = getReserves();
+
+        if (amount0Out > reserve0_ || amount1Out > reserve1_)
+            revert InsufficientLiquidity();
+
+        if (amount0Out > 0) _safeTransfer(token0, to, amount0Out);
+        if (amount1Out > 0) _safeTransfer(token1, to, amount1Out);
+
+        uint256 balance0 = IERC20(token0).balanceOf(address(this));
+        uint256 balance1 = IERC20(token1).balanceOf(address(this));
+
+        if (balance0 * balance1 < reserve0_ * reserve1_) revert InvalidK();
+
+        _update(balance0, balance1);
+
+        emit Swap(msg.sender, amount0In, amount1In, amount0Out, amount1Out, to);
     }
 
     function sync() public {
