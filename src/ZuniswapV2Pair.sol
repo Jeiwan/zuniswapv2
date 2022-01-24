@@ -32,8 +32,6 @@ contract ZuniswapV2Pair is ERC20, Math {
     event Sync(uint256 reserve0, uint256 reserve1);
     event Swap(
         address indexed sender,
-        uint256 amount0In,
-        uint256 amount1In,
         uint256 amount0Out,
         uint256 amount1Out,
         address indexed to
@@ -120,7 +118,7 @@ contract ZuniswapV2Pair is ERC20, Math {
 
         _update(balance0, balance1);
 
-        emit Swap(msg.sender, amount0In, amount1In, amount0Out, amount1Out, to);
+        emit Swap(msg.sender, amount0Out, amount1Out, to);
     }
 
     function sync() public {
