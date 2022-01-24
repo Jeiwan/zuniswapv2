@@ -17,6 +17,7 @@ error InsufficientLiquidityMinted();
 error InsufficientLiquidityBurned();
 error InsufficientOutputAmount();
 error InsufficientLiquidity();
+error InsufficientInputAmount();
 error InvalidK();
 error TransferFailed();
 
