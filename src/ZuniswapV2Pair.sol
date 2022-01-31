@@ -168,10 +168,10 @@ contract ZuniswapV2Pair is ERC20, Math {
         if (balance0 > type(uint112).max || balance1 > type(uint112).max)
             revert BalanceOverflow();
 
-        uint32 timeElapsed = uint32(block.timestamp) - blockTimestampLast;
+        unchecked {
+            uint32 timeElapsed = uint32(block.timestamp) - blockTimestampLast;
 
-        if (timeElapsed > 0 && reserve0_ > 0 && reserve1_ > 0) {
-            unchecked {
+            if (timeElapsed > 0 && reserve0_ > 0 && reserve1_ > 0) {
                 price0CumulativeLast +=
                     uint256(UQ112x112.encode(reserve1_).uqdiv(reserve0_)) *
                     timeElapsed;
