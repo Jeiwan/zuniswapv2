@@ -11,6 +11,7 @@ interface IERC20 {
     function transfer(address to, uint256 amount) external;
 }
 
+error AlreadyInitialized();
 error BalanceOverflow();
 error InsufficientLiquidityMinted();
 error InsufficientLiquidityBurned();
@@ -44,9 +45,12 @@ contract ZuniswapV2Pair is ERC20, Math {
         address indexed to
     );
 
-    constructor(address token0_, address token1_)
-        ERC20("ZuniswapV2 Pair", "ZUNIV2", 18)
-    {
+    constructor() ERC20("ZuniswapV2 Pair", "ZUNIV2", 18) {}
+
+    function initialize(address token0_, address token1_) public {
+        if (token0 != address(0) || token1 != address(0))
+            revert AlreadyInitialized();
+
         token0 = token0_;
         token1 = token1_;
     }

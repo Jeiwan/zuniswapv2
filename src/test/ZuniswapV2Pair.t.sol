@@ -2,6 +2,7 @@
 pragma solidity ^0.8.10;
 
 import "ds-test/test.sol";
+import "../ZuniswapV2Factory.sol";
 import "../ZuniswapV2Pair.sol";
 import "../mocks/ERC20Mintable.sol";
 import "../libraries/UQ112x112.sol";
@@ -29,7 +30,13 @@ contract ZuniswapV2PairTest is DSTest {
 
         token0 = new ERC20Mintable("Token A", "TKNA");
         token1 = new ERC20Mintable("Token B", "TKNB");
-        pair = new ZuniswapV2Pair(address(token0), address(token1));
+
+        ZuniswapV2Factory factory = new ZuniswapV2Factory();
+        address pairAddress = factory.createPair(
+            address(token0),
+            address(token1)
+        );
+        pair = ZuniswapV2Pair(pairAddress);
 
         token0.mint(10 ether, address(this));
         token1.mint(10 ether, address(this));
