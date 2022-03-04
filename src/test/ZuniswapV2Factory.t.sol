@@ -29,6 +29,14 @@ contract ZuniswapV2FactoryTest is DSTest {
         token3 = new ERC20Mintable("Token D", "TKND");
     }
 
+    function encodeError(string memory error)
+        internal
+        pure
+        returns (bytes memory encoded)
+    {
+        encoded = abi.encodeWithSignature(error);
+    }
+
     function testCreatePair() public {
         address pairAddress = factory.createPair(
             address(token1),
@@ -42,22 +50,22 @@ contract ZuniswapV2FactoryTest is DSTest {
     }
 
     function testCreatePairZeroAddress() public {
-        vm.expectRevert(hex"d92e233d"); // ZeroAddress
+        vm.expectRevert(encodeError("ZeroAddress()"));
         factory.createPair(address(0), address(token0));
 
-        vm.expectRevert(hex"d92e233d"); // ZeroAddress
+        vm.expectRevert(encodeError("ZeroAddress()"));
         factory.createPair(address(token1), address(0));
     }
 
     function testCreatePairPairExists() public {
         factory.createPair(address(token1), address(token0));
 
-        vm.expectRevert(hex"3d77e891"); // PairExists
+        vm.expectRevert(encodeError("PairExists()"));
         factory.createPair(address(token1), address(token0));
     }
 
     function testCreatePairIdenticalTokens() public {
-        vm.expectRevert(hex"bd969eb0"); // IdenticalAddresses
+        vm.expectRevert(encodeError("IdenticalAddresses()"));
         factory.createPair(address(token0), address(token0));
     }
 }
