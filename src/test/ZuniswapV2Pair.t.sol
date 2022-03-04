@@ -45,6 +45,22 @@ contract ZuniswapV2PairTest is DSTest {
         token1.mint(10 ether, address(testUser));
     }
 
+    function encodeError(string memory error)
+        internal
+        pure
+        returns (bytes memory encoded)
+    {
+        encoded = abi.encodeWithSignature(error);
+    }
+
+    function encodeError(string memory error, uint256 a)
+        internal
+        pure
+        returns (bytes memory encoded)
+    {
+        encoded = abi.encodeWithSignature(error, a);
+    }
+
     function assertReserves(uint112 expectedReserve0, uint112 expectedReserve1)
         internal
     {
@@ -136,9 +152,7 @@ contract ZuniswapV2PairTest is DSTest {
 
     function testMintLiquidityUnderflow() public {
         // 0x11: If an arithmetic operation results in underflow or overflow outside of an unchecked { ... } block.
-        vm.expectRevert(
-            hex"4e487b710000000000000000000000000000000000000000000000000000000000000011"
-        );
+        vm.expectRevert(encodeError("Panic(uint256)", 0x11));
         pair.mint();
     }
 
@@ -146,7 +160,7 @@ contract ZuniswapV2PairTest is DSTest {
         token0.transfer(address(pair), 1000);
         token1.transfer(address(pair), 1000);
 
-        vm.expectRevert(hex"d226f9d4"); // InsufficientLiquidityMinted()
+        vm.expectRevert(encodeError("InsufficientLiquidityMinted()"));
         pair.mint();
     }
 
@@ -227,9 +241,7 @@ contract ZuniswapV2PairTest is DSTest {
 
     function testBurnZeroTotalSupply() public {
         // 0x12; If you divide or modulo by zero.
-        vm.expectRevert(
-            hex"4e487b710000000000000000000000000000000000000000000000000000000000000012"
-        );
+        vm.expectRevert(encodeError("Panic(uint256)", 0x12));
         pair.burn();
     }
 
@@ -240,7 +252,7 @@ contract ZuniswapV2PairTest is DSTest {
         pair.mint();
 
         vm.prank(address(0xdeadbeef));
-        vm.expectRevert(hex"749383ad"); // InsufficientLiquidityBurned()
+        vm.expectRevert(encodeError("InsufficientLiquidityBurned()"));
         pair.burn();
     }
 
@@ -325,7 +337,7 @@ contract ZuniswapV2PairTest is DSTest {
         token1.transfer(address(pair), 2 ether);
         pair.mint();
 
-        vm.expectRevert(hex"42301c23"); // InsufficientOutputAmount
+        vm.expectRevert(encodeError("InsufficientOutputAmount()"));
         pair.swap(0, 0, address(this));
     }
 
@@ -334,10 +346,10 @@ contract ZuniswapV2PairTest is DSTest {
         token1.transfer(address(pair), 2 ether);
         pair.mint();
 
-        vm.expectRevert(hex"bb55fd27"); // InsufficientLiquidity
+        vm.expectRevert(encodeError("InsufficientLiquidity()"));
         pair.swap(0, 2.1 ether, address(this));
 
-        vm.expectRevert(hex"bb55fd27"); // InsufficientLiquidity
+        vm.expectRevert(encodeError("InsufficientLiquidity()"));
         pair.swap(1.1 ether, 0, address(this));
     }
 
@@ -369,7 +381,7 @@ contract ZuniswapV2PairTest is DSTest {
 
         token0.transfer(address(pair), 0.1 ether);
 
-        vm.expectRevert(hex"bd8bc364"); // InsufficientLiquidity
+        vm.expectRevert(encodeError("InvalidK()"));
         pair.swap(0, 0.36 ether, address(this));
 
         assertEq(
