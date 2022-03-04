@@ -64,6 +64,7 @@ contract ZuniswapV2PairTest is DSTest {
 
     function calculateCurrentPrice()
         internal
+        view
         returns (uint256 price0, uint256 price1)
     {
         (uint112 reserve0, uint112 reserve1, ) = pair.getReserves();
@@ -230,9 +231,6 @@ contract ZuniswapV2PairTest is DSTest {
         token0.transfer(address(pair), 1 ether);
         token1.transfer(address(pair), 1 ether);
         pair.mint();
-
-        // Burn as a user who hasn't provided liquidity.
-        bytes memory prankData = abi.encodeWithSignature("burn()");
 
         vm.prank(address(0xdeadbeef));
         vm.expectRevert(hex"749383ad"); // InsufficientLiquidityBurned()
