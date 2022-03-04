@@ -2,10 +2,7 @@
 pragma solidity ^0.8.10;
 
 import "./ZuniswapV2Pair.sol";
-
-interface IZuniswapV2Pair {
-    function initialize(address, address) external;
-}
+import "./interfaces/IZuniswapV2Pair.sol";
 
 contract ZuniswapV2Factory {
     error IdenticalAddresses();
