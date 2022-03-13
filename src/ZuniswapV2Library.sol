@@ -34,7 +34,7 @@ library ZuniswapV2Library {
 
     //
     //
-    // PRIVATE
+    // INTERNAL
     //
     //
     function _sortTokens(address tokenA, address tokenB)
@@ -49,7 +49,7 @@ library ZuniswapV2Library {
         address factoryAddress,
         address tokenA,
         address tokenB
-    ) internal returns (address pairAddress) {
+    ) internal pure returns (address pairAddress) {
         (address token0, address token1) = _sortTokens(tokenA, tokenB);
         pairAddress = address(
             uint160(
