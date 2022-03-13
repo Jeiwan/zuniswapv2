@@ -92,6 +92,7 @@ contract ZuniswapV2Router {
                     reserveB,
                     reserveA
                 );
+                assert(amountAOptimal <= amountADesired);
 
                 if (amountAOptimal <= amountAMin) revert InsufficientAAmount();
                 (amountA, amountB) = (amountAOptimal, amountBDesired);

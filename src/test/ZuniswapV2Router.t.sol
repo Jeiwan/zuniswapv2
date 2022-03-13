@@ -7,7 +7,13 @@ import "../ZuniswapV2Pair.sol";
 import "../ZuniswapV2Router.sol";
 import "../mocks/ERC20Mintable.sol";
 
-contract ZuniswapV2Rouer is DSTest {
+interface Vm {
+    function expectRevert(bytes calldata) external;
+}
+
+contract ZuniswapV2RouterTest is DSTest {
+    Vm vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
+
     ZuniswapV2Factory factory;
     ZuniswapV2Router router;
 
@@ -21,11 +27,37 @@ contract ZuniswapV2Rouer is DSTest {
         tokenA = new ERC20Mintable("Token A", "TKNA");
         tokenB = new ERC20Mintable("Token B", "TKNB");
 
-        tokenA.mint(10 ether, address(this));
-        tokenB.mint(10 ether, address(this));
+        tokenA.mint(20 ether, address(this));
+        tokenB.mint(20 ether, address(this));
     }
 
-    function testAddLiquidity() public {
+    function encodeError(string memory error)
+        internal
+        pure
+        returns (bytes memory encoded)
+    {
+        encoded = abi.encodeWithSignature(error);
+    }
+
+    function testAddLiquidityCreatesPair() public {
+        tokenA.approve(address(router), 1 ether);
+        tokenB.approve(address(router), 1 ether);
+
+        router.addLiquidity(
+            address(tokenA),
+            address(tokenB),
+            1 ether,
+            1 ether,
+            1 ether,
+            1 ether,
+            address(this)
+        );
+
+        address pairAddress = factory.pairs(address(tokenA), address(tokenB));
+        assertEq(pairAddress, 0x5accAf4c77532604fb72190E395E625E14A1f734);
+    }
+
+    function testAddLiquidityNoPair() public {
         tokenA.approve(address(router), 1 ether);
         tokenB.approve(address(router), 1 ether);
 
@@ -56,7 +88,131 @@ contract ZuniswapV2Rouer is DSTest {
         assertEq(pair.totalSupply(), 1 ether);
         assertEq(pair.balanceOf(address(this)), 1 ether - 1000);
 
-        assertEq(tokenA.balanceOf(address(this)), 9 ether);
-        assertEq(tokenB.balanceOf(address(this)), 9 ether);
+        assertEq(tokenA.balanceOf(address(this)), 19 ether);
+        assertEq(tokenB.balanceOf(address(this)), 19 ether);
+    }
+
+    function testAddLiquidityAmountBOptimalIsOk() public {
+        address pairAddress = factory.createPair(
+            address(tokenA),
+            address(tokenB)
+        );
+
+        ZuniswapV2Pair pair = ZuniswapV2Pair(pairAddress);
+
+        assertEq(pair.token0(), address(tokenB));
+        assertEq(pair.token1(), address(tokenA));
+
+        tokenA.transfer(pairAddress, 1 ether);
+        tokenB.transfer(pairAddress, 2 ether);
+        pair.mint(address(this));
+
+        tokenA.approve(address(router), 1 ether);
+        tokenB.approve(address(router), 2 ether);
+
+        (uint256 amountA, uint256 amountB, uint256 liquidity) = router
+        .addLiquidity(
+            address(tokenA),
+            address(tokenB),
+            1 ether,
+            2 ether,
+            1 ether,
+            1.9 ether,
+            address(this)
+        );
+
+        assertEq(amountA, 1 ether);
+        assertEq(amountB, 2 ether);
+        assertEq(liquidity, 1414213562373095048);
+    }
+
+    function testAddLiquidityAmountBOptimalIsTooLow() public {
+        address pairAddress = factory.createPair(
+            address(tokenA),
+            address(tokenB)
+        );
+
+        ZuniswapV2Pair pair = ZuniswapV2Pair(pairAddress);
+        assertEq(pair.token0(), address(tokenB));
+        assertEq(pair.token1(), address(tokenA));
+
+        tokenA.transfer(pairAddress, 5 ether);
+        tokenB.transfer(pairAddress, 10 ether);
+        pair.mint(address(this));
+
+        tokenA.approve(address(router), 1 ether);
+        tokenB.approve(address(router), 2 ether);
+
+        vm.expectRevert(encodeError("InsufficientBAmount()"));
+        router.addLiquidity(
+            address(tokenA),
+            address(tokenB),
+            1 ether,
+            2 ether,
+            1 ether,
+            2 ether,
+            address(this)
+        );
+    }
+
+    function testAddLiquidityAmountBOptimalTooHighAmountATooLow() public {
+        address pairAddress = factory.createPair(
+            address(tokenA),
+            address(tokenB)
+        );
+        ZuniswapV2Pair pair = ZuniswapV2Pair(pairAddress);
+
+        assertEq(pair.token0(), address(tokenB));
+        assertEq(pair.token1(), address(tokenA));
+
+        tokenA.transfer(pairAddress, 10 ether);
+        tokenB.transfer(pairAddress, 5 ether);
+        pair.mint(address(this));
+
+        tokenA.approve(address(router), 2 ether);
+        tokenB.approve(address(router), 1 ether);
+
+        vm.expectRevert(encodeError("InsufficientAAmount()"));
+        router.addLiquidity(
+            address(tokenA),
+            address(tokenB),
+            2 ether,
+            0.9 ether,
+            2 ether,
+            1 ether,
+            address(this)
+        );
+    }
+
+    function testAddLiquidityAmountBOptimalIsTooHighAmountAOk() public {
+        address pairAddress = factory.createPair(
+            address(tokenA),
+            address(tokenB)
+        );
+        ZuniswapV2Pair pair = ZuniswapV2Pair(pairAddress);
+
+        assertEq(pair.token0(), address(tokenB));
+        assertEq(pair.token1(), address(tokenA));
+
+        tokenA.transfer(pairAddress, 10 ether);
+        tokenB.transfer(pairAddress, 5 ether);
+        pair.mint(address(this));
+
+        tokenA.approve(address(router), 2 ether);
+        tokenB.approve(address(router), 1 ether);
+
+        (uint256 amountA, uint256 amountB, uint256 liquidity) = router
+        .addLiquidity(
+            address(tokenA),
+            address(tokenB),
+            2 ether,
+            0.9 ether,
+            1.7 ether,
+            1 ether,
+            address(this)
+        );
+        assertEq(amountA, 1.8 ether);
+        assertEq(amountB, 0.9 ether);
+        assertEq(liquidity, 1272792206135785543);
     }
 }
