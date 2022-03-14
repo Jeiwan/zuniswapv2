@@ -57,4 +57,34 @@ contract ZuniswapV2LibraryTest is DSTest {
         amountOut = ZuniswapV2Library.quote(1 ether, 1 ether, 2 ether);
         assertEq(amountOut, 2 ether);
     }
+
+    function testPairFor() public {
+        address pairAddress = ZuniswapV2Library.pairFor(
+            address(factory),
+            address(tokenA),
+            address(tokenB)
+        );
+
+        assertEq(pairAddress, factory.pairs(address(tokenA), address(tokenB)));
+    }
+
+    function testPairForTokensSorting() public {
+        address pairAddress = ZuniswapV2Library.pairFor(
+            address(factory),
+            address(tokenB),
+            address(tokenA)
+        );
+
+        assertEq(pairAddress, factory.pairs(address(tokenA), address(tokenB)));
+    }
+
+    function testPairForNonexistentFactory() public {
+        address pairAddress = ZuniswapV2Library.pairFor(
+            address(0xaabbcc),
+            address(tokenB),
+            address(tokenA)
+        );
+
+        assertEq(pairAddress, 0xf443958ecAB6d329f4FDa7C4794BD04725e6C1c4);
+    }
 }

@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.10;
 
+import "./interfaces/IZuniswapV2Factory.sol";
 import "./interfaces/IZuniswapV2Pair.sol";
 
 library ZuniswapV2Library {
@@ -12,9 +13,9 @@ library ZuniswapV2Library {
         address tokenA,
         address tokenB
     ) public returns (uint256 reserveA, uint256 reserveB) {
-        (address token0, address token1) = _sortTokens(tokenA, tokenB);
+        (address token0, address token1) = sortTokens(tokenA, tokenB);
         (uint256 reserve0, uint256 reserve1, ) = IZuniswapV2Pair(
-            _pairFor(factoryAddress, token0, token1)
+            pairFor(factoryAddress, token0, token1)
         ).getReserves();
         (reserveA, reserveB) = tokenA == token0
             ? (reserve0, reserve1)
@@ -32,12 +33,7 @@ library ZuniswapV2Library {
         return (amountIn * reserveOut) / reserveIn;
     }
 
-    //
-    //
-    // INTERNAL
-    //
-    //
-    function _sortTokens(address tokenA, address tokenB)
+    function sortTokens(address tokenA, address tokenB)
         internal
         pure
         returns (address token0, address token1)
@@ -45,12 +41,12 @@ library ZuniswapV2Library {
         return tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
     }
 
-    function _pairFor(
+    function pairFor(
         address factoryAddress,
         address tokenA,
         address tokenB
     ) internal pure returns (address pairAddress) {
-        (address token0, address token1) = _sortTokens(tokenA, tokenB);
+        (address token0, address token1) = sortTokens(tokenA, tokenB);
         pairAddress = address(
             uint160(
                 uint256(

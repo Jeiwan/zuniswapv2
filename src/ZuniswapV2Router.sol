@@ -44,7 +44,7 @@ contract ZuniswapV2Router {
             amountAMin,
             amountBMin
         );
-        address pairAddress = ZuniswapV2Library._pairFor(
+        address pairAddress = ZuniswapV2Library.pairFor(
             address(factory),
             tokenA,
             tokenB
