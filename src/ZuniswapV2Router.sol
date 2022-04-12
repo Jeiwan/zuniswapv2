@@ -54,6 +54,21 @@ contract ZuniswapV2Router {
         liquidity = IZuniswapV2Pair(pairAddress).mint(to);
     }
 
+    function removeLiquidity(
+        address tokenA,
+        address tokenB,
+        uint256 liquidity,
+        uint256 amountAMin,
+        uint256 amountBMin,
+        address to
+    ) public returns (uint256 amountA, uint256 amountB) {
+        address pair = ZuniswapV2Library.pairFor(address(factory), tokenA, tokenB);
+        IZuniswapV2Pair(pair).transferFrom(msg.sender, pair, liquidity);
+        (amountA, amountB) = IZuniswapV2Pair(pair).burn(to);
+        if (amountA < amountAMin) revert InsufficientAAmount();
+        if (amountA < amountBMin) revert InsufficientBAmount();
+    }
+
     //
     //
     //

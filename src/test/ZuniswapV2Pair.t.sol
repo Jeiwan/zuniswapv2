@@ -170,7 +170,9 @@ contract ZuniswapV2PairTest is DSTest {
 
         pair.mint(address(this));
 
-        pair.burn();
+        uint256 liquidity = pair.balanceOf(address(this));
+        pair.transfer(address(pair), liquidity);
+        pair.burn(address(this));
 
         assertEq(pair.balanceOf(address(this)), 0);
         assertReserves(1000, 1000);
@@ -190,7 +192,9 @@ contract ZuniswapV2PairTest is DSTest {
 
         pair.mint(address(this)); // + 1 LP
 
-        pair.burn();
+        uint256 liquidity = pair.balanceOf(address(this));
+        pair.transfer(address(pair), liquidity);
+        pair.burn(address(this));
 
         assertEq(pair.balanceOf(address(this)), 0);
         assertReserves(1500, 1000);
@@ -217,7 +221,9 @@ contract ZuniswapV2PairTest is DSTest {
 
         pair.mint(address(this)); // + 1 LP
 
-        pair.burn();
+        uint256 liquidity = pair.balanceOf(address(this));
+        pair.transfer(address(pair), liquidity);
+        pair.burn(address(this));
 
         // this user is penalized for providing unbalanced liquidity
         assertEq(pair.balanceOf(address(this)), 0);
@@ -226,7 +232,7 @@ contract ZuniswapV2PairTest is DSTest {
         assertEq(token0.balanceOf(address(this)), 10 ether - 0.5 ether);
         assertEq(token1.balanceOf(address(this)), 10 ether);
 
-        testUser.withdrawLiquidity(address(pair));
+        testUser.removeLiquidity(address(pair));
 
         // testUser receives the amount collected from this user
         assertEq(pair.balanceOf(address(testUser)), 0);
@@ -242,7 +248,7 @@ contract ZuniswapV2PairTest is DSTest {
     function testBurnZeroTotalSupply() public {
         // 0x12; If you divide or modulo by zero.
         vm.expectRevert(encodeError("Panic(uint256)", 0x12));
-        pair.burn();
+        pair.burn(address(this));
     }
 
     function testBurnZeroLiquidity() public {
@@ -253,7 +259,7 @@ contract ZuniswapV2PairTest is DSTest {
 
         vm.prank(address(0xdeadbeef));
         vm.expectRevert(encodeError("InsufficientLiquidityBurned()"));
-        pair.burn();
+        pair.burn(address(this));
     }
 
     function testReservesPacking() public {
@@ -483,7 +489,11 @@ contract TestUser {
         ZuniswapV2Pair(pairAddress_).mint(address(this));
     }
 
-    function withdrawLiquidity(address pairAddress_) public {
-        ZuniswapV2Pair(pairAddress_).burn();
+    function removeLiquidity(
+        address pairAddress_
+    ) public {
+        uint256 liquidity = ERC20(pairAddress_).balanceOf(address(this));
+        ERC20(pairAddress_).transfer(pairAddress_, liquidity);
+        ZuniswapV2Pair(pairAddress_).burn(address(this));
     }
 }
