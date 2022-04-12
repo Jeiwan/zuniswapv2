@@ -13,4 +13,12 @@ interface IZuniswapV2Pair {
         );
 
     function mint(address) external returns (uint256);
+
+    function burn(address) external returns (uint256, uint256);
+
+    function transferFrom(
+        address,
+        address,
+        uint256
+    ) external returns (bool);
 }
