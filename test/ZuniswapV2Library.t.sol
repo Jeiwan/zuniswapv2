@@ -15,6 +15,14 @@ contract ZuniswapV2LibraryTest is Test {
 
     ZuniswapV2Pair pair;
 
+    function encodeError(string memory error)
+        internal
+        pure
+        returns (bytes memory encoded)
+    {
+        encoded = abi.encodeWithSignature(error);
+    }
+
     function setUp() public {
         factory = new ZuniswapV2Factory();
 
@@ -86,5 +94,29 @@ contract ZuniswapV2LibraryTest is Test {
         );
 
         assertEq(pairAddress, 0x8BbD00dFF82468090E7D720E9fB3a6529C73Ff9e);
+    }
+
+    function testGetAmountOut() public {
+        uint256 amountOut = ZuniswapV2Library.getAmountOut(
+            1000,
+            1 ether,
+            1.5 ether
+        );
+        assertEq(amountOut, 1495);
+    }
+
+    function testGetAmountOutZeroInputAmount() public {
+        vm.expectRevert(encodeError("InsufficientAmount()"));
+        ZuniswapV2Library.getAmountOut(0, 1 ether, 1.5 ether);
+    }
+
+    function testGetAmountOutZeroInputReserve() public {
+        vm.expectRevert(encodeError("InsufficientLiquidity()"));
+        ZuniswapV2Library.getAmountOut(1000, 0, 1.5 ether);
+    }
+
+    function testGetAmountOutZeroOutputReserve() public {
+        vm.expectRevert(encodeError("InsufficientLiquidity()"));
+        ZuniswapV2Library.getAmountOut(1000, 1 ether, 0);
     }
 }
