@@ -7,13 +7,27 @@ import "../ZuniswapV2Factory.sol";
 import "../ZuniswapV2Pair.sol";
 import "../mocks/ERC20Mintable.sol";
 
+interface Vm {
+    function expectRevert(bytes calldata) external;
+}
+
 contract ZuniswapV2LibraryTest is DSTest {
+    Vm vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
+
     ZuniswapV2Factory factory;
 
     ERC20Mintable tokenA;
     ERC20Mintable tokenB;
 
     ZuniswapV2Pair pair;
+
+    function encodeError(string memory error)
+        internal
+        pure
+        returns (bytes memory encoded)
+    {
+        encoded = abi.encodeWithSignature(error);
+    }
 
     function setUp() public {
         factory = new ZuniswapV2Factory();
@@ -86,5 +100,41 @@ contract ZuniswapV2LibraryTest is DSTest {
         );
 
         assertEq(pairAddress, 0x8BbD00dFF82468090E7D720E9fB3a6529C73Ff9e);
+    }
+
+    function testGetAmountOut() public {
+        uint256 amountOut = ZuniswapV2Library.getAmountOut(
+            1000,
+            1 ether,
+            1.5 ether
+        );
+        assertEq(amountOut, 1495);
+    }
+
+    function testGetAmountOutZeroInputAmount() public {
+        vm.expectRevert(encodeError("InsufficientAmount()"));
+        ZuniswapV2Library.getAmountOut(
+            0,
+            1 ether,
+            1.5 ether
+        );
+    }
+
+    function testGetAmountOutZeroInputReserve() public {
+        vm.expectRevert(encodeError("InsufficientLiquidity()"));
+        ZuniswapV2Library.getAmountOut(
+            1000,
+            0,
+            1.5 ether
+        );
+    }
+
+    function testGetAmountOutZeroOutputReserve() public {
+        vm.expectRevert(encodeError("InsufficientLiquidity()"));
+        ZuniswapV2Library.getAmountOut(
+            1000,
+            1 ether,
+            0
+        );
     }
 }
