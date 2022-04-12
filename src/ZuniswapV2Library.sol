@@ -8,6 +8,7 @@ import {ZuniswapV2Pair} from "./ZuniswapV2Pair.sol";
 library ZuniswapV2Library {
     error InsufficientAmount();
     error InsufficientLiquidity();
+    error InvalidPath();
 
     function getReserves(
         address factoryAddress,
@@ -73,5 +74,18 @@ library ZuniswapV2Library {
         uint256 denominator = (reserveIn * 1000) + amountInWithFee;
 
         return numerator / denominator;
+    }
+
+    function getAmountsOut(address factory, uint256 amountIn, address[] memory path) public returns (uint256[] memory) {
+        if (path.length < 2) revert InvalidPath();
+        uint256[] memory amounts = new uint256[](path.length);
+        amounts[0] = amountIn;
+
+        for(uint i; i < path.length-1; i++) {
+            (uint256 reserve0, uint256 reserve1) = getReserves(factory, path[i], path[i+1]);
+            amounts[i+1] = getAmountOut(amounts[i], reserve0, reserve1);
+        }
+
+        return amounts;
     }
 }
