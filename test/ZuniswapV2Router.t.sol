@@ -51,7 +51,7 @@ contract ZuniswapV2RouterTest is Test {
         );
 
         address pairAddress = factory.pairs(address(tokenA), address(tokenB));
-        assertEq(pairAddress, 0x1200107eD3bbF12Ef4Ac648b9a36F8be48f3b0D7);
+        assertEq(pairAddress, 0xB8983AB1e6d025AF203A5c1437874046a0d49F0c);
     }
 
     function testAddLiquidityNoPair() public {
