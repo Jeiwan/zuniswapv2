@@ -114,4 +114,25 @@ library ZuniswapV2Library {
 
         return (numerator / denominator) + 1;
     }
-}
+
+    function getAmountsIn(
+        address factory,
+        uint256 amountOut,
+        address[] memory path
+    ) public returns (uint256[] memory) {
+        if (path.length < 2) revert InvalidPath();
+        uint256[] memory amounts = new uint256[](path.length);
+        amounts[amounts.length - 1] = amountOut;
+
+        for (uint256 i = path.length- 1; i > 0; i--) {
+            (uint256 reserve0, uint256 reserve1) = getReserves(
+                factory,
+                path[i - 1],
+                path[i]
+            );
+            amounts[i - 1] = getAmountIn(amounts[i], reserve0, reserve1);
+        }
+
+        return amounts;
+    }
+
