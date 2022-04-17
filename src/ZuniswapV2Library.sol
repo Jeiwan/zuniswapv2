@@ -124,7 +124,7 @@ library ZuniswapV2Library {
         uint256[] memory amounts = new uint256[](path.length);
         amounts[amounts.length - 1] = amountOut;
 
-        for (uint256 i = path.length- 1; i > 0; i--) {
+        for (uint256 i = path.length - 1; i > 0; i--) {
             (uint256 reserve0, uint256 reserve1) = getReserves(
                 factory,
                 path[i - 1],
@@ -135,4 +135,4 @@ library ZuniswapV2Library {
 
         return amounts;
     }
-
+}
