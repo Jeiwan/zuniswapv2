@@ -63,7 +63,11 @@ contract ZuniswapV2Router {
         uint256 amountBMin,
         address to
     ) public returns (uint256 amountA, uint256 amountB) {
-        address pair = ZuniswapV2Library.pairFor(address(factory), tokenA, tokenB);
+        address pair = ZuniswapV2Library.pairFor(
+            address(factory),
+            tokenA,
+            tokenB
+        );
         IZuniswapV2Pair(pair).transferFrom(msg.sender, pair, liquidity);
         (amountA, amountB) = IZuniswapV2Pair(pair).burn(to);
         if (amountA < amountAMin) revert InsufficientAAmount();
@@ -76,8 +80,13 @@ contract ZuniswapV2Router {
         address[] calldata path,
         address to
     ) public returns (uint256[] memory amounts) {
-        amounts = ZuniswapV2Library.getAmountsOut(address(factory), amountIn, path);
-        if (amounts[amounts.length - 1] < amountOutMin) revert InsufficientOutputAmount();
+        amounts = ZuniswapV2Library.getAmountsOut(
+            address(factory),
+            amountIn,
+            path
+        );
+        if (amounts[amounts.length - 1] < amountOutMin)
+            revert InsufficientOutputAmount();
         _safeTransferFrom(
             path[0],
             msg.sender,
@@ -94,16 +103,28 @@ contract ZuniswapV2Router {
     //
     //
     //
-    function _swap(uint256[] memory amounts, address[] memory path, address to_) internal {
-        for (uint i; i < path.length-1; i++) {
-            (address input, address output) = (path[i], path[i+1]);
-            (address token0,) = ZuniswapV2Library.sortTokens(input, output);
-            uint256 amountOut = amounts[i+1];
-            (uint256 amount0Out, uint256 amount1Out) = input == token0 ? (uint(0), amountOut) : (amountOut, uint(0));
-            address to = i < path.length -2 ? ZuniswapV2Library.pairFor(address(factory), output, path[i+2]) : to_;
-            IZuniswapV2Pair(ZuniswapV2Library.pairFor(address(factory), input, output)).swap(
-                amount0Out, amount1Out, to
-            );
+    function _swap(
+        uint256[] memory amounts,
+        address[] memory path,
+        address to_
+    ) internal {
+        for (uint256 i; i < path.length - 1; i++) {
+            (address input, address output) = (path[i], path[i + 1]);
+            (address token0, ) = ZuniswapV2Library.sortTokens(input, output);
+            uint256 amountOut = amounts[i + 1];
+            (uint256 amount0Out, uint256 amount1Out) = input == token0
+                ? (uint256(0), amountOut)
+                : (amountOut, uint256(0));
+            address to = i < path.length - 2
+                ? ZuniswapV2Library.pairFor(
+                    address(factory),
+                    output,
+                    path[i + 2]
+                )
+                : to_;
+            IZuniswapV2Pair(
+                ZuniswapV2Library.pairFor(address(factory), input, output)
+            ).swap(amount0Out, amount1Out, to);
         }
     }
 

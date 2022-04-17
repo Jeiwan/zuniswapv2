@@ -46,16 +46,10 @@ contract ZuniswapV2LibraryTest is Test {
         );
         pair = ZuniswapV2Pair(pairAddress);
 
-        pairAddress = factory.createPair(
-            address(tokenB),
-            address(tokenC)
-        );
+        pairAddress = factory.createPair(address(tokenB), address(tokenC));
         pair2 = ZuniswapV2Pair(pairAddress);
 
-        pairAddress = factory.createPair(
-            address(tokenC),
-            address(tokenD)
-        );
+        pairAddress = factory.createPair(address(tokenC), address(tokenD));
         pair3 = ZuniswapV2Pair(pairAddress);
     }
 
@@ -177,10 +171,6 @@ contract ZuniswapV2LibraryTest is Test {
         path[0] = address(tokenA);
 
         vm.expectRevert(encodeError("InvalidPath()"));
-        ZuniswapV2Library.getAmountsOut(
-            address(factory),
-            0.1 ether,
-            path
-        );
+        ZuniswapV2Library.getAmountsOut(address(factory), 0.1 ether, path);
     }
 }
