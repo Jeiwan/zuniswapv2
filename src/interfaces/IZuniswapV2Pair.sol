@@ -21,4 +21,10 @@ interface IZuniswapV2Pair {
         address,
         uint256
     ) external returns (bool);
+
+    function swap(
+        uint256,
+        uint256,
+        address
+    ) external;
 }
