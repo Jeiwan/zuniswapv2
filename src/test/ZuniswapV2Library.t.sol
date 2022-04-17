@@ -52,16 +52,10 @@ contract ZuniswapV2LibraryTest is DSTest {
         );
         pair = ZuniswapV2Pair(pairAddress);
 
-        pairAddress = factory.createPair(
-            address(tokenB),
-            address(tokenC)
-        );
+        pairAddress = factory.createPair(address(tokenB), address(tokenC));
         pair2 = ZuniswapV2Pair(pairAddress);
 
-        pairAddress = factory.createPair(
-            address(tokenC),
-            address(tokenD)
-        );
+        pairAddress = factory.createPair(address(tokenC), address(tokenD));
         pair3 = ZuniswapV2Pair(pairAddress);
     }
 
@@ -133,29 +127,17 @@ contract ZuniswapV2LibraryTest is DSTest {
 
     function testGetAmountOutZeroInputAmount() public {
         vm.expectRevert(encodeError("InsufficientAmount()"));
-        ZuniswapV2Library.getAmountOut(
-            0,
-            1 ether,
-            1.5 ether
-        );
+        ZuniswapV2Library.getAmountOut(0, 1 ether, 1.5 ether);
     }
 
     function testGetAmountOutZeroInputReserve() public {
         vm.expectRevert(encodeError("InsufficientLiquidity()"));
-        ZuniswapV2Library.getAmountOut(
-            1000,
-            0,
-            1.5 ether
-        );
+        ZuniswapV2Library.getAmountOut(1000, 0, 1.5 ether);
     }
 
     function testGetAmountOutZeroOutputReserve() public {
         vm.expectRevert(encodeError("InsufficientLiquidity()"));
-        ZuniswapV2Library.getAmountOut(
-            1000,
-            1 ether,
-            0
-        );
+        ZuniswapV2Library.getAmountOut(1000, 1 ether, 0);
     }
 
     function testGetAmountsOut() public {
@@ -195,10 +177,6 @@ contract ZuniswapV2LibraryTest is DSTest {
         path[0] = address(tokenA);
 
         vm.expectRevert(encodeError("InvalidPath()"));
-        ZuniswapV2Library.getAmountsOut(
-            address(factory),
-            0.1 ether,
-            path
-        );
+        ZuniswapV2Library.getAmountsOut(address(factory), 0.1 ether, path);
     }
 }

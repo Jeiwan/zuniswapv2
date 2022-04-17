@@ -35,7 +35,12 @@ contract ZuniswapV2Pair is ERC20, Math {
     uint256 public price0CumulativeLast;
     uint256 public price1CumulativeLast;
 
-    event Burn(address indexed sender, uint256 amount0, uint256 amount1, address to);
+    event Burn(
+        address indexed sender,
+        uint256 amount0,
+        uint256 amount1,
+        address to
+    );
     event Mint(address indexed sender, uint256 amount0, uint256 amount1);
     event Sync(uint256 reserve0, uint256 reserve1);
     event Swap(
@@ -81,7 +86,10 @@ contract ZuniswapV2Pair is ERC20, Math {
         emit Mint(to, amount0, amount1);
     }
 
-    function burn(address to) public returns (uint256 amount0, uint256 amount1) {
+    function burn(address to)
+        public
+        returns (uint256 amount0, uint256 amount1)
+    {
         uint256 balance0 = IERC20(token0).balanceOf(address(this));
         uint256 balance1 = IERC20(token1).balanceOf(address(this));
         uint256 liquidity = balanceOf[address(this)];

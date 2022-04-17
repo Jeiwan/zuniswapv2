@@ -489,9 +489,7 @@ contract TestUser {
         ZuniswapV2Pair(pairAddress_).mint(address(this));
     }
 
-    function removeLiquidity(
-        address pairAddress_
-    ) public {
+    function removeLiquidity(address pairAddress_) public {
         uint256 liquidity = ERC20(pairAddress_).balanceOf(address(this));
         ERC20(pairAddress_).transfer(pairAddress_, liquidity);
         ZuniswapV2Pair(pairAddress_).burn(address(this));

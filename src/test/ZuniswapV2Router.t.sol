@@ -65,15 +65,15 @@ contract ZuniswapV2RouterTest is DSTest {
         tokenB.approve(address(router), 1 ether);
 
         (uint256 amountA, uint256 amountB, uint256 liquidity) = router
-        .addLiquidity(
-            address(tokenA),
-            address(tokenB),
-            1 ether,
-            1 ether,
-            1 ether,
-            1 ether,
-            address(this)
-        );
+            .addLiquidity(
+                address(tokenA),
+                address(tokenB),
+                1 ether,
+                1 ether,
+                1 ether,
+                1 ether,
+                address(this)
+            );
 
         assertEq(amountA, 1 ether);
         assertEq(amountB, 1 ether);
@@ -114,15 +114,15 @@ contract ZuniswapV2RouterTest is DSTest {
         tokenB.approve(address(router), 2 ether);
 
         (uint256 amountA, uint256 amountB, uint256 liquidity) = router
-        .addLiquidity(
-            address(tokenA),
-            address(tokenB),
-            1 ether,
-            2 ether,
-            1 ether,
-            1.9 ether,
-            address(this)
-        );
+            .addLiquidity(
+                address(tokenA),
+                address(tokenB),
+                1 ether,
+                2 ether,
+                1 ether,
+                1.9 ether,
+                address(this)
+            );
 
         assertEq(amountA, 1 ether);
         assertEq(amountB, 2 ether);
@@ -205,15 +205,15 @@ contract ZuniswapV2RouterTest is DSTest {
         tokenB.approve(address(router), 1 ether);
 
         (uint256 amountA, uint256 amountB, uint256 liquidity) = router
-        .addLiquidity(
-            address(tokenA),
-            address(tokenB),
-            2 ether,
-            0.9 ether,
-            1.7 ether,
-            1 ether,
-            address(this)
-        );
+            .addLiquidity(
+                address(tokenA),
+                address(tokenB),
+                2 ether,
+                0.9 ether,
+                1.7 ether,
+                1 ether,
+                address(this)
+            );
         assertEq(amountA, 1.8 ether);
         assertEq(amountB, 0.9 ether);
         assertEq(liquidity, 1272792206135785543);
@@ -248,7 +248,7 @@ contract ZuniswapV2RouterTest is DSTest {
             address(this)
         );
 
-        (uint256 reserve0, uint256 reserve1,) = pair.getReserves();
+        (uint256 reserve0, uint256 reserve1, ) = pair.getReserves();
         assertEq(reserve0, 1000);
         assertEq(reserve1, 1000);
         assertEq(pair.balanceOf(address(this)), 0);
@@ -287,7 +287,7 @@ contract ZuniswapV2RouterTest is DSTest {
             address(this)
         );
 
-        (uint256 reserve0, uint256 reserve1,) = pair.getReserves();
+        (uint256 reserve0, uint256 reserve1, ) = pair.getReserves();
         assertEq(reserve0, 0.7 ether + 300);
         assertEq(reserve1, 0.7 ether + 300);
         assertEq(pair.balanceOf(address(this)), 0.7 ether - 700);
@@ -397,8 +397,14 @@ contract ZuniswapV2RouterTest is DSTest {
         );
 
         // Swap 0.3 TKNA for ~0.186 TKNB
-        assertEq(tokenA.balanceOf(address(this)), 20 ether - 1 ether - 0.3 ether);
+        assertEq(
+            tokenA.balanceOf(address(this)),
+            20 ether - 1 ether - 0.3 ether
+        );
         assertEq(tokenB.balanceOf(address(this)), 20 ether - 2 ether);
-        assertEq(tokenC.balanceOf(address(this)), 20 ether - 1 ether + 0.186691414219734305 ether);
+        assertEq(
+            tokenC.balanceOf(address(this)),
+            20 ether - 1 ether + 0.186691414219734305 ether
+        );
     }
 }
