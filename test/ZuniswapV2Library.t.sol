@@ -173,4 +173,28 @@ contract ZuniswapV2LibraryTest is Test {
         vm.expectRevert(encodeError("InvalidPath()"));
         ZuniswapV2Library.getAmountsOut(address(factory), 0.1 ether, path);
     }
+
+    function testGetAmountIn() public {
+        uint256 amountIn = ZuniswapV2Library.getAmountIn(
+            1495,
+            1 ether,
+            1.5 ether
+        );
+        assertEq(amountIn, 1000);
+    }
+
+    function testGetAmountInZeroInputAmount() public {
+        vm.expectRevert(encodeError("InsufficientAmount()"));
+        ZuniswapV2Library.getAmountIn(0, 1 ether, 1.5 ether);
+    }
+
+    function testGetAmountInZeroInputReserve() public {
+        vm.expectRevert(encodeError("InsufficientLiquidity()"));
+        ZuniswapV2Library.getAmountIn(1000, 0, 1.5 ether);
+    }
+
+    function testGetAmountInZeroOutputReserve() public {
+        vm.expectRevert(encodeError("InsufficientLiquidity()"));
+        ZuniswapV2Library.getAmountIn(1000, 1 ether, 0);
+    }
 }
