@@ -56,7 +56,7 @@ library ZuniswapV2Library {
                             hex"ff",
                             factoryAddress,
                             keccak256(abi.encodePacked(token0, token1)),
-                            hex"2dc9479fe8bce19448a83c0f296513d7f7b9792d90a97298a0f6ca5a30f2edc2"
+                            hex"4db8191b3ab6d8cdd59e8147bab652b0513dae69500e9cb7cecd5573f701d86d"
                         )
                     )
                 )
