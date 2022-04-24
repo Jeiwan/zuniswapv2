@@ -260,8 +260,9 @@ contract ZuniswapV2PairTest is DSTest {
         token1.transfer(address(pair), 2 ether);
         pair.mint();
 
+        uint256 amountOut = 0.181322178776029826 ether;
         token0.transfer(address(pair), 0.1 ether);
-        pair.swap(0, 0.18 ether, address(this));
+        pair.swap(0, amountOut, address(this));
 
         assertEq(
             token0.balanceOf(address(this)),
@@ -270,10 +271,10 @@ contract ZuniswapV2PairTest is DSTest {
         );
         assertEq(
             token1.balanceOf(address(this)),
-            10 ether - 2 ether + 0.18 ether,
+            10 ether - 2 ether + amountOut,
             "unexpected token1 balance"
         );
-        assertReserves(1 ether + 0.1 ether, 2 ether - 0.18 ether);
+        assertReserves(1 ether + 0.1 ether, uint112(2 ether - amountOut));
     }
 
     function testSwapBasicScenarioReverseDirection() public {
@@ -360,6 +361,17 @@ contract ZuniswapV2PairTest is DSTest {
             "unexpected token1 balance"
         );
         assertReserves(1 ether, 2 ether);
+    }
+
+    function testSwapUnpaidFee() public {
+        token0.transfer(address(pair), 1 ether);
+        token1.transfer(address(pair), 2 ether);
+        pair.mint(address(this));
+
+        token0.transfer(address(pair), 0.1 ether);
+
+        vm.expectRevert(encodeError("InvalidK()"));
+        pair.swap(0, 0.181322178776029827 ether, address(this));
     }
 
     function testCumulativePrices() public {
