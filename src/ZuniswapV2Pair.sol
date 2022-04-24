@@ -145,7 +145,7 @@ contract ZuniswapV2Pair is ERC20, Math {
 
         if (amount0In == 0 && amount1In == 0) revert InsufficientInputAmount();
 
-        // Adjusted = balance before swap + swap fee
+        // Adjusted = balance before swap - swap fee; fee stays in the contract
         uint256 balance0Adjusted = (balance0 * 1000) - (amount0In * 3);
         uint256 balance1Adjusted = (balance1 * 1000) - (amount1In * 3);
 
