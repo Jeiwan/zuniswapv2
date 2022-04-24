@@ -37,6 +37,8 @@ contract ZuniswapV2Pair is ERC20, Math {
     uint256 public price0CumulativeLast;
     uint256 public price1CumulativeLast;
 
+    bool private isEntered;
+
     event Burn(
         address indexed sender,
         uint256 amount0,
@@ -51,6 +53,15 @@ contract ZuniswapV2Pair is ERC20, Math {
         uint256 amount1Out,
         address indexed to
     );
+
+    modifier nonReentrant() {
+        require(!isEntered);
+        isEntered = true;
+
+        _;
+
+        isEntered = false;
+    }
 
     constructor() ERC20("ZuniswapV2 Pair", "ZUNIV2", 18) {}
 
@@ -120,7 +131,7 @@ contract ZuniswapV2Pair is ERC20, Math {
         uint256 amount1Out,
         address to,
         bytes calldata data
-    ) public {
+    ) public nonReentrant {
         if (amount0Out == 0 && amount1Out == 0)
             revert InsufficientOutputAmount();
 
@@ -131,7 +142,13 @@ contract ZuniswapV2Pair is ERC20, Math {
 
         if (amount0Out > 0) _safeTransfer(token0, to, amount0Out);
         if (amount1Out > 0) _safeTransfer(token1, to, amount1Out);
-        if (data.length > 0) IZuniswapV2Callee(to).zuniswapV2Call(msg.sender, amount0Out, amount1Out, data);
+        if (data.length > 0)
+            IZuniswapV2Callee(to).zuniswapV2Call(
+                msg.sender,
+                amount0Out,
+                amount1Out,
+                data
+            );
 
         uint256 balance0 = IERC20(token0).balanceOf(address(this));
         uint256 balance1 = IERC20(token1).balanceOf(address(this));
