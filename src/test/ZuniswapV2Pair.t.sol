@@ -501,6 +501,7 @@ contract ZuniswapV2PairTest is DSTest {
         fl.flashloan(address(pair), 0, flashloanAmount, address(token1));
 
         assertEq(token1.balanceOf(address(fl)), 0);
+        assertEq(token1.balanceOf(address(pair)), 2 ether + flashloanFee);
     }
 }
 
