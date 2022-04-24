@@ -23,3 +23,4 @@ $ cat out/ZuniswapV2Pair.sol/ZuniswapV2Pair.json | jq -r .bytecode.object | xarg
 1. [Part 2](https://jeiwan.net/posts/programming-defi-uniswapv2-2/), tokens swapping, re-entrancy attacks and protection,
    price oracle, integer overflow and underflow, safe transfer.
 1. [Part 3](https://jeiwan.net/posts/programming-defi-uniswapv2-3/), factory contract, CREATE2 opcode, Router contract, Library contract
+1. [Part 4](https://jeiwan.net/posts/programming-defi-uniswapv2-4/), LP-tokens burning bug, liquidity removal, output amount calculation, swapExactTokensForTokens, swapTokensForExactTokens, fixing swap fee bug, flash loans, fixing re-entrancy vulnerability, protocol fees
