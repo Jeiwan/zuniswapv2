@@ -14,7 +14,7 @@
 
 ## Update Factory code hash
 ```shell
-$ cat out/ZuniswapV2Pair.sol/ZuniswapV2Pair.json | jq -r .bytecode.object | xargs cast keccak
+$ forge inspect ZuniswapV2Pair bytecode| xargs cast keccak
 ```
 
 ## Blog posts
