@@ -258,7 +258,11 @@ contract ZuniswapV2PairTest is Test {
         bytes32 val = vm.load(address(pair), bytes32(uint256(8)));
         assertEq(
             val,
-            hex"000000000000000000001bc16d674ec800000000000000000de0b6b3a7640000"
+            // prettier-ignore
+            bytes32(abi.encodePacked(
+                uint32(block.timestamp),     // blockTimestampLast
+                uint112(0x1BC16D674EC80000), // 2 * 10^18 (token1 balance)
+                uint112(0xDE0B6B3A7640000))) // 1 * 10^18 (token 0 balance)
         );
     }
 
