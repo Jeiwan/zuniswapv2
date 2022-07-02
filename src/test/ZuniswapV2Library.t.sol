@@ -100,16 +100,6 @@ contract ZuniswapV2LibraryTest is Test {
         assertEq(pairAddress, factory.pairs(address(tokenA), address(tokenB)));
     }
 
-    function testPairForNonexistentFactory() public {
-        address pairAddress = ZuniswapV2Library.pairFor(
-            address(0xaabbcc),
-            address(tokenB),
-            address(tokenA)
-        );
-
-        assertEq(pairAddress, 0xE17b76B82490122B62f50Ac30066CB2235De009f);
-    }
-
     function testGetAmountOut() public {
         uint256 amountOut = ZuniswapV2Library.getAmountOut(
             1000,
