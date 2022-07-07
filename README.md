@@ -11,12 +11,6 @@
 1. Run tests:
    `forge test`
 
-
-## Update Factory code hash
-```shell
-$ cat out/ZuniswapV2Pair.sol/ZuniswapV2Pair.json | jq -r .bytecode.object | xargs cast keccak
-```
-
 ## Blog posts
 
 1. [Part 1](https://jeiwan.net/posts/programming-defi-uniswapv2-1/), architecture of UniswapV2, adding liquidity, first tests in Solidity, removing liquidity.
