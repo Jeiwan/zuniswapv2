@@ -1,23 +1,11 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.10;
 
-import "ds-test/test.sol";
+import "forge-std/Test.sol";
 import "../src/ZuniswapV2Pair.sol";
 import "./mocks/ERC20Mintable.sol";
 
-interface Vm {
-    function expectRevert(bytes calldata) external;
-
-    function prank(address) external;
-
-    function load(address c, bytes32 loc) external returns (bytes32);
-
-    function warp(uint256) external;
-}
-
-contract ZuniswapV2PairTest is DSTest {
-    Vm vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
-
+contract ZuniswapV2PairTest is Test {
     ERC20Mintable token0;
     ERC20Mintable token1;
     ZuniswapV2Pair pair;
@@ -102,7 +90,7 @@ contract ZuniswapV2PairTest is DSTest {
         token0.transfer(address(pair), 1000);
         token1.transfer(address(pair), 1000);
 
-        vm.expectRevert(hex"d226f9d4"); // InsufficientLiquidityMinted()
+        vm.expectRevert(bytes(hex"d226f9d4")); // InsufficientLiquidityMinted()
         pair.mint();
     }
 
@@ -199,7 +187,7 @@ contract ZuniswapV2PairTest is DSTest {
         bytes memory prankData = abi.encodeWithSignature("burn()");
 
         vm.prank(address(0xdeadbeef));
-        vm.expectRevert(hex"749383ad"); // InsufficientLiquidityBurned()
+        vm.expectRevert(bytes(hex"749383ad")); // InsufficientLiquidityBurned()
         pair.burn();
     }
 
