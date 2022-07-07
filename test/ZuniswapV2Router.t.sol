@@ -1,19 +1,13 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.10;
 
-import "ds-test/test.sol";
-import "../ZuniswapV2Factory.sol";
-import "../ZuniswapV2Pair.sol";
-import "../ZuniswapV2Router.sol";
-import "../mocks/ERC20Mintable.sol";
+import "forge-std/Test.sol";
+import "../src/ZuniswapV2Factory.sol";
+import "../src/ZuniswapV2Pair.sol";
+import "../src/ZuniswapV2Router.sol";
+import "./mocks/ERC20Mintable.sol";
 
-interface Vm {
-    function expectRevert(bytes calldata) external;
-}
-
-contract ZuniswapV2RouterTest is DSTest {
-    Vm vm = Vm(0x7109709ECfa91a80626fF3989D68f67F5b1DD12D);
-
+contract ZuniswapV2RouterTest is Test {
     ZuniswapV2Factory factory;
     ZuniswapV2Router router;
 
@@ -54,7 +48,7 @@ contract ZuniswapV2RouterTest is DSTest {
         );
 
         address pairAddress = factory.pairs(address(tokenA), address(tokenB));
-        assertEq(pairAddress, 0x5accAf4c77532604fb72190E395E625E14A1f734);
+        assertEq(pairAddress, 0x84fdcceBF68F6f692173d2DbA5e55714f73e3C57);
     }
 
     function testAddLiquidityNoPair() public {
@@ -62,15 +56,15 @@ contract ZuniswapV2RouterTest is DSTest {
         tokenB.approve(address(router), 1 ether);
 
         (uint256 amountA, uint256 amountB, uint256 liquidity) = router
-        .addLiquidity(
-            address(tokenA),
-            address(tokenB),
-            1 ether,
-            1 ether,
-            1 ether,
-            1 ether,
-            address(this)
-        );
+            .addLiquidity(
+                address(tokenA),
+                address(tokenB),
+                1 ether,
+                1 ether,
+                1 ether,
+                1 ether,
+                address(this)
+            );
 
         assertEq(amountA, 1 ether);
         assertEq(amountB, 1 ether);
@@ -111,15 +105,15 @@ contract ZuniswapV2RouterTest is DSTest {
         tokenB.approve(address(router), 2 ether);
 
         (uint256 amountA, uint256 amountB, uint256 liquidity) = router
-        .addLiquidity(
-            address(tokenA),
-            address(tokenB),
-            1 ether,
-            2 ether,
-            1 ether,
-            1.9 ether,
-            address(this)
-        );
+            .addLiquidity(
+                address(tokenA),
+                address(tokenB),
+                1 ether,
+                2 ether,
+                1 ether,
+                1.9 ether,
+                address(this)
+            );
 
         assertEq(amountA, 1 ether);
         assertEq(amountB, 2 ether);
@@ -202,15 +196,15 @@ contract ZuniswapV2RouterTest is DSTest {
         tokenB.approve(address(router), 1 ether);
 
         (uint256 amountA, uint256 amountB, uint256 liquidity) = router
-        .addLiquidity(
-            address(tokenA),
-            address(tokenB),
-            2 ether,
-            0.9 ether,
-            1.7 ether,
-            1 ether,
-            address(this)
-        );
+            .addLiquidity(
+                address(tokenA),
+                address(tokenB),
+                2 ether,
+                0.9 ether,
+                1.7 ether,
+                1 ether,
+                address(this)
+            );
         assertEq(amountA, 1.8 ether);
         assertEq(amountB, 0.9 ether);
         assertEq(liquidity, 1272792206135785543);

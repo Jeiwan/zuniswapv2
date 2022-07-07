@@ -1,13 +1,13 @@
 // SPDX-License-Identifier: Unlicense
 pragma solidity ^0.8.10;
 
-import "ds-test/test.sol";
-import "../ZuniswapV2Library.sol";
-import "../ZuniswapV2Factory.sol";
-import "../ZuniswapV2Pair.sol";
-import "../mocks/ERC20Mintable.sol";
+import "forge-std/Test.sol";
+import "../src/ZuniswapV2Library.sol";
+import "../src/ZuniswapV2Factory.sol";
+import "../src/ZuniswapV2Pair.sol";
+import "./mocks/ERC20Mintable.sol";
 
-contract ZuniswapV2LibraryTest is DSTest {
+contract ZuniswapV2LibraryTest is Test {
     ZuniswapV2Factory factory;
 
     ERC20Mintable tokenA;
@@ -85,6 +85,6 @@ contract ZuniswapV2LibraryTest is DSTest {
             address(tokenA)
         );
 
-        assertEq(pairAddress, 0xf443958ecAB6d329f4FDa7C4794BD04725e6C1c4);
+        assertEq(pairAddress, 0x4e8FbaC93aA8c13344D6ceA76dc412614c08Fb1d);
     }
 }

@@ -3,6 +3,7 @@ pragma solidity ^0.8.10;
 
 import "./interfaces/IZuniswapV2Factory.sol";
 import "./interfaces/IZuniswapV2Pair.sol";
+import {ZuniswapV2Pair} from "./ZuniswapV2Pair.sol";
 
 library ZuniswapV2Library {
     error InsufficientAmount();
@@ -55,7 +56,7 @@ library ZuniswapV2Library {
                             hex"ff",
                             factoryAddress,
                             keccak256(abi.encodePacked(token0, token1)),
-                            hex"049f60b9e01e08c8f30809369bea021451544d751aa028da0bc80c726d334c6c"
+                            keccak256(type(ZuniswapV2Pair).creationCode)
                         )
                     )
                 )
