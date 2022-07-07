@@ -2,8 +2,8 @@
 pragma solidity ^0.8.10;
 
 import "ds-test/test.sol";
-import "../ZuniswapV2Pair.sol";
-import "../mocks/ERC20Mintable.sol";
+import "../src/ZuniswapV2Pair.sol";
+import "./mocks/ERC20Mintable.sol";
 
 interface Vm {
     function expectRevert(bytes calldata) external;
