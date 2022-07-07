@@ -235,7 +235,7 @@ contract ZuniswapV2PairTest is Test {
         bytes32 val = vm.load(address(pair), bytes32(uint256(8)));
         assertEq(
             val,
-            hex"000000000000000000001bc16d674ec800000000000000000de0b6b3a7640000"
+            hex"000000010000000000001bc16d674ec800000000000000000de0b6b3a7640000"
         );
     }
 
@@ -308,7 +308,7 @@ contract ZuniswapV2PairTest is Test {
         token1.transfer(address(pair), 2 ether);
         pair.mint();
 
-        vm.expectRevert(hex"42301c23"); // InsufficientOutputAmount
+        vm.expectRevert(bytes(hex"42301c23")); // InsufficientOutputAmount
         pair.swap(0, 0, address(this));
     }
 
@@ -317,10 +317,10 @@ contract ZuniswapV2PairTest is Test {
         token1.transfer(address(pair), 2 ether);
         pair.mint();
 
-        vm.expectRevert(hex"bb55fd27"); // InsufficientLiquidity
+        vm.expectRevert(bytes(hex"bb55fd27")); // InsufficientLiquidity
         pair.swap(0, 2.1 ether, address(this));
 
-        vm.expectRevert(hex"bb55fd27"); // InsufficientLiquidity
+        vm.expectRevert(bytes(hex"bb55fd27")); // InsufficientLiquidity
         pair.swap(1.1 ether, 0, address(this));
     }
 
@@ -352,7 +352,7 @@ contract ZuniswapV2PairTest is Test {
 
         token0.transfer(address(pair), 0.1 ether);
 
-        vm.expectRevert(hex"bd8bc364"); // InsufficientLiquidity
+        vm.expectRevert(bytes(hex"bd8bc364")); // InsufficientLiquidity
         pair.swap(0, 0.36 ether, address(this));
 
         assertEq(
