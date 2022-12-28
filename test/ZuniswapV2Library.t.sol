@@ -85,6 +85,6 @@ contract ZuniswapV2LibraryTest is Test {
             address(tokenA)
         );
 
-        assertEq(pairAddress, 0x4e8FbaC93aA8c13344D6ceA76dc412614c08Fb1d);
+        assertEq(pairAddress, 0x9745Ced9e932AA0C4950aD2446A066C4E5C2bFEb);
     }
 }
